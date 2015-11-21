@@ -2,44 +2,76 @@
  * Define a grammar called Hello
  */
 grammar Sem;
-r  : 
+r 
+    :   
 	program ;         // match keyword hello followed by an identifier
 
-program : BEGIN '{' definiciones lista_problemas '}' END;
+program
+    :   BEGIN '{' definitionList problemList '}' END ;
 
-definiciones : carril ',' sensor ',' semaforo ',' cruce ';' ;
+definitionList
+    :   definition* intersect* ;
 
-carril : CARRIL ID ID_SUCESSION ';' ;
+definition
+    :   lane 
+    |   sensor 
+    |   semaphore ;
 
-sensor : SENSOR ID ID_SUCESSION ';' ;
+lane
+    :   LANE ID idList ';' ;
 
-semaforo : SEMAFORO ID ID_SUCESSION ';' ; 
+sensor
+    :   SENSOR ID idList ';' ;
 
-cruce : CRUCE ID '(' ID ',' ID ',' ID ID_SUCESSION ')' ';' ;
+semaphore
+    :   SEMAPHORE  ID idList ';' ; 
 
-lista_problemas: (problemas (',' problemas)*) ';';
-problemas: PROBLEMA '(' ID ',' ID ')' ';' ;
+intersect
+    :   INTERSECT ID '(' ID ',' ID idList ')' ';' ;
+
+problemList: (problem (',' problem)*);
+
+problem: PROBLEM '(' ID ',' ID ')' ';' ;
 
 
-BEGIN : 'begin';
-END : 'end';
-CARRIL: 'carril';
+BEGIN
+    :   'begin';
+END
+    :   'end';
+LANE: 'lane';
 SENSOR: 'sensor';
-SEMAFORO: 'semaforo';
-CRUCE: 'cruce';
-PROBLEMA: 'problema';
+SEMAPHORE: 'semaphore';
+INTERSECT: 'intersect';
+PROBLEM: 'problem';
 
-ID_SUCESSION : (',' ID) ;
+idList
+    :   (',' ID)* ;
 
-ID : LOWER(LOWER | UPPER | DIGIT)* ;             // match lower-case identifiers
+ID
+    :   LOWER(LOWER 
+    |   UPPER 
+    |   DIGIT)* ;   // match lower-case identifiers
 
-LOWER : [a-z] ; 
+LOWER
+    :   [a-z] ; 
 
-UPPER : [A-Z] ;
+UPPER
+    :   [A-Z] ;
 
-DIGIT : [0-9];
+DIGIT
+    :   [0-9];
 
-NUMBER : [0-9]+;
+NUMBER
+    :   [0-9]+;
 
-WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
+WS
+    :   [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
+
+COMMENT
+    :     '/*' .*? '*/' -> skip
+    ;
+
+LINE_COMMENT
+    :     '//' ~[\r\n]* -> skip
+    ;
 
